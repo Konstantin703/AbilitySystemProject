@@ -9,6 +9,9 @@
 /**
  * 
  */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChange, float, Health, float, MaxHealth);
+
 UCLASS()
 class ABILITYSYSTEMPROJECT_API UAttributeSetBase : public UAttributeSet
 {
@@ -21,8 +24,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttributeSetBase")
 	FGameplayAttributeData Health;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttributeSetBase")
+	FGameplayAttributeData MaxHealth;
 
-	FGameplayAttributeData GetHealth() { return Health; }
-	
-	
+	FGameplayAttributeData GetHealth() { return Health; }	
+
+	FOnHealthChange OnHealthChange;
 };
