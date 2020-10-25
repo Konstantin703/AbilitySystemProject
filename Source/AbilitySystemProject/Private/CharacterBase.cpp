@@ -7,6 +7,7 @@
 #include "Camera/PlayerCameraManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "AbilitySystemComponent.h"
+#include "AttributeSetBase.h"
 
 ACharacterBase::ACharacterBase()
 {
@@ -20,6 +21,7 @@ ACharacterBase::ACharacterBase()
 	PlayerEye->SetupAttachment(CameraBoom);
 
 	AbilitySystemComp = CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComponent");
+	AttributeSetBaseComp = CreateDefaultSubobject<UAttributeSetBase>("AttributeSetBaseComponent");
 }
 
 void ACharacterBase::BeginPlay()
@@ -54,17 +56,14 @@ void ACharacterBase::MoveForward(float Value)
 {
 	if (Value != 0.f)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Moving Forward from C++"));
 		AddMovementInput(UGameplayStatics::GetPlayerCameraManager(this, 0)->GetActorForwardVector(), Value);
 	}
-	
 }
 
 void ACharacterBase::MoveRight(float Value)
 {
 	if (Value != 0.f)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Strafing from C++"));
 		AddMovementInput(UGameplayStatics::GetPlayerCameraManager(this, 0)->GetActorRightVector(), Value);
 	}
 }
