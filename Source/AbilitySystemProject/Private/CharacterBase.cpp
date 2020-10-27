@@ -8,6 +8,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "AbilitySystemComponent.h"
 #include "AttributeSetBase.h"
+#include "AIController.h"
+#include "BrainComponent.h"
 
 ACharacterBase::ACharacterBase()
 {
@@ -22,12 +24,16 @@ ACharacterBase::ACharacterBase()
 
 	AbilitySystemComp = CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComponent");
 	AttributeSetBaseComp = CreateDefaultSubobject<UAttributeSetBase>("AttributeSetBaseComponent");
+
+	bIsDead = false;
+	TeamID = 255;
 }
 
 void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	AttributeSetBaseComp->OnHealthChange.AddDynamic(this, &ACharacterBase::OnHealthChanged);
+	AutoDetermineTeamIDByControllerType();
 }
 
 void ACharacterBase::Tick(float DeltaTime)
@@ -90,7 +96,41 @@ void ACharacterBase::OnHealthChanged(float Health, float MaxHealth)
 	if (Health <= 0.f && !bIsDead)
 	{
 		bIsDead = true;
+		Dead();
 		BP_Die();
 	}
 	BP_OnHealthChanged(Health, MaxHealth);
+}
+
+bool ACharacterBase::IsOtherHostile(ACharacterBase* InPawn)
+{
+	return TeamID != InPawn->GetTeamID();
+}
+
+uint8 ACharacterBase::GetTeamID() const
+{
+	return TeamID;
+}
+
+void ACharacterBase::AutoDetermineTeamIDByControllerType()
+{
+	if (GetController() && GetController()->IsPlayerController())
+	{
+		TeamID = 0;
+	}
+}
+
+void ACharacterBase::Dead()
+{
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		PlayerController->DisableInput(PlayerController);
+	}
+
+	AAIController* AIController = Cast<AAIController>(GetController());
+	if (AIController)
+	{
+		AIController->GetBrainComponent()->StopLogic("Dead");
+	}
 }

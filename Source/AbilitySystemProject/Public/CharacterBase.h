@@ -35,8 +35,6 @@ public:
 	
 	void MoveForward(float Value);
 	void MoveRight(float Value);
-	/*void TurnAtRate(float Rate);
-	void LookUpAtRate(float Rate);*/
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterBase")
 	UAbilitySystemComponent* AbilitySystemComp;
@@ -56,7 +54,17 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "CharacterBase", meta = (DisplayName = "Die"))
 	void BP_Die();
 
+	UFUNCTION(BlueprintCallable, Category = "CharacterBase")
+	bool IsOtherHostile(ACharacterBase* InPawn);
+
+	uint8 GetTeamID() const;
+
 protected:
-	bool bIsDead = false;
+	bool bIsDead;
+	uint8 TeamID;
+
+	void AutoDetermineTeamIDByControllerType();
+
+	void Dead();
 
 };
