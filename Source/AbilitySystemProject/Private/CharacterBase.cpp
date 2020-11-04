@@ -10,6 +10,7 @@
 #include "AttributeSetBase.h"
 #include "AIController.h"
 #include "BrainComponent.h"
+#include "GameplayTagContainer.h"
 
 ACharacterBase::ACharacterBase()
 {
@@ -35,7 +36,8 @@ void ACharacterBase::BeginPlay()
 	AttributeSetBaseComp->OnHealthChange.AddDynamic(this, &ACharacterBase::OnHealthChanged);
 	AttributeSetBaseComp->OnManaChange.AddDynamic(this, &ACharacterBase::OnManaChanged);
 	AttributeSetBaseComp->OnStrengthChange.AddDynamic(this, &ACharacterBase::OnStrengthChanged);
-	AutoDetermineTeamIDByControllerType();
+	AutoDetermineTeamIDByControllerType(); 
+	AddGameplayTag(FullHealthTag);
 }
 
 void ACharacterBase::Tick(float DeltaTime)
@@ -122,6 +124,17 @@ bool ACharacterBase::IsOtherHostile(ACharacterBase* InPawn)
 uint8 ACharacterBase::GetTeamID() const
 {
 	return TeamID;
+}
+
+void ACharacterBase::AddGameplayTag(FGameplayTag& TagToAdd)
+{
+	GetAbilitySystemComponent()->AddLooseGameplayTag(TagToAdd);
+	GetAbilitySystemComponent()->SetTagMapCount(TagToAdd, 1);
+}
+
+void ACharacterBase::RemoveGameplayTag(FGameplayTag& TagToRemove)
+{
+	GetAbilitySystemComponent()->RemoveLooseGameplayTag(TagToRemove);
 }
 
 void ACharacterBase::AutoDetermineTeamIDByControllerType()

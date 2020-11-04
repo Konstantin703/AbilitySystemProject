@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayTagContainer.h"
 #include "CharacterBase.generated.h"
 
 class USpringArmComponent;
@@ -70,12 +71,19 @@ public:
 
 	uint8 GetTeamID() const;
 
+	UFUNCTION(BlueprintCallable, Category = "CharacterBase")
+	void AddGameplayTag(FGameplayTag& TagToAdd);
+	UFUNCTION(BlueprintCallable, Category = "CharacterBase")
+	void RemoveGameplayTag(FGameplayTag& TagToRemove);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterBase")
+	FGameplayTag FullHealthTag;
+
 protected:
 	bool bIsDead;
 	uint8 TeamID;
 
 	void AutoDetermineTeamIDByControllerType();
-
 	void Dead();
 
 };

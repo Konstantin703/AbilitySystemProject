@@ -3,12 +3,13 @@
 #include "AttributeSetBase.h"
 #include "GameplayEffectExtension.h"
 #include "GameplayEffect.h"
+#include "CharacterBase.h"
 
 UAttributeSetBase::UAttributeSetBase()
 	: Health(200.f),
 	MaxHealth(200.f),
 	Mana(100.f),
-	MaxMana(150.f),
+	MaxMana(100.f),
 	Strength(250.f),
 	MaxStrength(250.f)
 {
@@ -22,6 +23,20 @@ void UAttributeSetBase::PostGameplayEffectExecute(const struct FGameplayEffectMo
 		Health.SetCurrentValue(FMath::Clamp(Health.GetCurrentValue(), 0.f, MaxHealth.GetCurrentValue()));
 		Health.SetBaseValue(FMath::Clamp(Health.GetBaseValue(), 0.f, MaxHealth.GetCurrentValue()));
 		OnHealthChange.Broadcast(Health.GetCurrentValue(), MaxHealth.GetCurrentValue());
+
+		ACharacterBase* Character = Cast<ACharacterBase>(GetOwningActor());
+
+		if (Character)
+		{
+			if (Health.GetCurrentValue() == MaxHealth.GetCurrentValue())
+			{				
+				Character->AddGameplayTag(Character->FullHealthTag);
+			}
+			else
+			{
+				Character->RemoveGameplayTag(Character->FullHealthTag);
+			}
+		}		
 	}
 
 	if (Data.EvaluatedData.Attribute.GetUProperty()
