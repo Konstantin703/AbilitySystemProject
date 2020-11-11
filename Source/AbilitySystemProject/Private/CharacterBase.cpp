@@ -11,6 +11,7 @@
 #include "AIController.h"
 #include "BrainComponent.h"
 #include "GameplayTagContainer.h"
+#include "GameFramework/Actor.h"
 
 ACharacterBase::ACharacterBase()
 {
@@ -147,6 +148,11 @@ void ACharacterBase::AutoDetermineTeamIDByControllerType()
 
 void ACharacterBase::Dead()
 {
+	DisableInputControl();
+}
+
+void ACharacterBase::DisableInputControl()
+{
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	if (PlayerController)
 	{
@@ -158,4 +164,30 @@ void ACharacterBase::Dead()
 	{
 		AIController->GetBrainComponent()->StopLogic("Dead");
 	}
+}
+
+void ACharacterBase::EnableInputControl()
+{
+	if (!bIsDead)
+	{
+		APlayerController* PlayerController = Cast<APlayerController>(GetController());
+		if (PlayerController)
+		{
+			PlayerController->EnableInput(PlayerController);
+		}
+
+		AAIController* AIController = Cast<AAIController>(GetController());
+		if (AIController)
+		{
+			AIController->GetBrainComponent()->RestartLogic();
+		}
+	}	
+}
+
+void ACharacterBase::HitStun(float StunDuration)
+{
+	DisableInputControl();
+
+	GetWorldTimerManager().SetTimer(StunTimeHandle, this, &ACharacterBase::EnableInputControl, StunDuration, false);
+
 }
