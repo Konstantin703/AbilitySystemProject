@@ -12,6 +12,9 @@
 #include "BrainComponent.h"
 #include "GameplayTagContainer.h"
 #include "GameFramework/Actor.h"
+#include "PlayerControllerBase.h"
+#include "AbilityTypes.h"
+#include "GameplayAbilityBase.h"
 
 ACharacterBase::ACharacterBase()
 {
@@ -93,6 +96,22 @@ void ACharacterBase::AquireAbility(TSubclassOf<UGameplayAbility> AbilityToAquire
 			AbilitySystemComp->GiveAbility(FGameplayAbilitySpec(AbilityToAquire, 1, 0));
 		}
 		AbilitySystemComp->InitAbilityActorInfo(this, this);
+	}
+}
+
+void ACharacterBase::AquireAbilities(TArray<TSubclassOf<UGameplayAbility>> AbilitiesToAquire)
+{
+	for (TSubclassOf<UGameplayAbility> AbilityItem : AbilitiesToAquire)
+	{
+		AquireAbility(AbilityItem);
+		if (AbilityItem->IsChildOf(UGameplayAbilityBase::StaticClass()))
+		{
+			TSubclassOf<UGameplayAbilityBase> AbilityBaseClass = *AbilityItem;
+			if (AbilityBaseClass)
+			{
+				AddAbilityToUI(AbilityBaseClass);
+			}
+		}
 	}
 }
 
@@ -190,4 +209,18 @@ void ACharacterBase::HitStun(float StunDuration)
 
 	GetWorldTimerManager().SetTimer(StunTimeHandle, this, &ACharacterBase::EnableInputControl, StunDuration, false);
 
+}
+
+void ACharacterBase::AddAbilityToUI(TSubclassOf<UGameplayAbilityBase> AbilityToAdd)
+{
+	APlayerControllerBase* PlayerControllerBase = Cast<APlayerControllerBase>(GetController());
+	if (PlayerControllerBase)
+	{
+		UGameplayAbilityBase* AbilityInstance = AbilityToAdd.Get()->GetDefaultObject<UGameplayAbilityBase>();
+		if (AbilityInstance)
+		{
+			FGameplayAbilityInfo AbilityInfo = AbilityInstance->GetAbilityInfo();
+			PlayerControllerBase->AddAbilityToUI(AbilityInfo);
+		}
+	}
 }

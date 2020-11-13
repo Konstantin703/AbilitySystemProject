@@ -13,6 +13,7 @@ class UCameraComponent;
 class UAbilitySystemComponent;
 class UGameplayAbility;
 class UAttributeSetBase;
+class UGameplayAbilityBase;
 
 UCLASS()
 class ABILITYSYSTEMPROJECT_API ACharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -46,6 +47,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "CharacterBase")
 	void AquireAbility(TSubclassOf<UGameplayAbility> AbilityToAquire);
+	UFUNCTION(BlueprintCallable, Category = "CharacterBase")
+	void AquireAbilities(TArray<TSubclassOf<UGameplayAbility>> AbilitiesToAquire);
 
 	UFUNCTION()
 	void OnHealthChanged(float Health, float MaxHealth);
@@ -92,4 +95,6 @@ protected:
 	void EnableInputControl();
 
 	FTimerHandle StunTimeHandle;
+
+	void AddAbilityToUI(TSubclassOf<UGameplayAbilityBase> AbilityToAdd);
 };
