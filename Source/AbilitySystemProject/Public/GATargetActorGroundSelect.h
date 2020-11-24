@@ -14,13 +14,16 @@ class ABILITYSYSTEMPROJECT_API AGATargetActorGroundSelect : public AGameplayAbil
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GroundSelect")
+	AGATargetActorGroundSelect();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true), Category = "GroundSelect")
 	float Radius;
 
 	virtual void StartTargeting(UGameplayAbility* Ability) override;
 	virtual void ConfirmTargetingAndContinue() override;
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	UFUNCTION(BlueprintCallable, Category = "GroundSelect")
-	bool GetPlayerLookPoint(OUT FVector& OutViewPoint);
+	bool GetPlayerLookPoint(FVector& OutViewPoint);
 	
 };

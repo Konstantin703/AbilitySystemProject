@@ -3,6 +3,12 @@
 #include "GATargetActorGroundSelect.h"
 #include "GameplayAbility.h"
 #include "GameFramework/PlayerController.h"
+#include "DrawDebugHelpers.h"
+
+AGATargetActorGroundSelect::AGATargetActorGroundSelect()
+{
+	PrimaryActorTick.bCanEverTick = true;
+}
 
 void AGATargetActorGroundSelect::StartTargeting(UGameplayAbility* Ability)
 {
@@ -28,7 +34,7 @@ void AGATargetActorGroundSelect::ConfirmTargetingAndContinue()
 	APawn* MasterPawn = MasterPC->GetPawn();
 	if (MasterPawn)
 	{
-		CollisionQueryParams.AddIgnoredActor(MasterPC->GetUniqueID);
+		CollisionQueryParams.AddIgnoredActor(MasterPC->GetUniqueID());
 	}
 
 	bool bTryOverlap = GetWorld()->OverlapMultiByObjectType(
@@ -51,9 +57,29 @@ void AGATargetActorGroundSelect::ConfirmTargetingAndContinue()
 			}
 		}
 	}
+
+	if (OverlapedActors.Num())
+	{
+		FGameplayAbilityTargetDataHandle TargetData = StartLocation.MakeTargetDataHandleFromActors(OverlapedActors);
+		TargetDataReadyDelegate.Broadcast(TargetData);
+	}
+	else
+	{
+		TargetDataReadyDelegate.Broadcast(FGameplayAbilityTargetDataHandle());
+	}
 }
 
-bool AGATargetActorGroundSelect::GetPlayerLookPoint(OUT FVector& OutViewPoint)
+void AGATargetActorGroundSelect::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	FVector LookPoint;
+	GetPlayerLookPoint(LookPoint);
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *LookPoint.ToString())
+	DrawDebugSphere(GetWorld(), LookPoint, Radius, 32, FColor::Red, false, -1, 0, 5.f);
+}
+
+bool AGATargetActorGroundSelect::GetPlayerLookPoint(FVector& OutViewPoint)
 {
 	FVector ViewPoint;
 	FRotator ViewRotation;
@@ -66,7 +92,7 @@ bool AGATargetActorGroundSelect::GetPlayerLookPoint(OUT FVector& OutViewPoint)
 	APawn* MasterPawn = MasterPC->GetPawn();
 	if (MasterPawn)
 	{
-		QueryParams.AddIgnoredActor(MasterPC->GetUniqueID);
+		QueryParams.AddIgnoredActor(MasterPC->GetUniqueID());
 	}
 
 	bool bTrace = GetWorld()->LineTraceSingleByChannel(
