@@ -13,8 +13,12 @@ UCLASS()
 class ABILITYSYSTEMPROJECT_API UDamageExecutionCalculation : public UGameplayEffectExecutionCalculation
 {
 	GENERATED_BODY()
+public:
+	UDamageExecutionCalculation();
+
+	UProperty* HealthProperty;
+	FGameplayEffectAttributeCaptureDefinition HealthDef;	
 	
-	
-	
-	
+	void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const;
+
 };
