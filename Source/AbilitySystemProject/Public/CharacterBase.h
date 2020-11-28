@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include "GameplayTagContainer.h"
+#include "GameplayEffectTypes.h"
+#include "GameplayAbilityTargetTypes.h"
 #include "CharacterBase.generated.h"
 
 class USpringArmComponent;
@@ -84,6 +86,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "CharacterBase")
 	void HitStun(float StunDuration);
+
+	UFUNCTION(BlueprintCallable, Category = "CharacterBase")
+	void ApplyGameplayEffectHandle(const FGameplayEffectSpecHandle& SpecHandle, const FGameplayAbilityTargetDataHandle& TargetDataHandle);
 
 protected:
 	bool bIsDead;

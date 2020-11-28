@@ -15,6 +15,8 @@
 #include "PlayerControllerBase.h"
 #include "AbilityTypes.h"
 #include "GameplayAbilityBase.h"
+#include "GameplayEffectTypes.h"
+#include "GameplayAbilityTargetTypes.h"
 
 ACharacterBase::ACharacterBase()
 {
@@ -208,7 +210,14 @@ void ACharacterBase::HitStun(float StunDuration)
 	DisableInputControl();
 
 	GetWorldTimerManager().SetTimer(StunTimeHandle, this, &ACharacterBase::EnableInputControl, StunDuration, false);
+}
 
+void ACharacterBase::ApplyGameplayEffectHandle(const FGameplayEffectSpecHandle& SpecHandle, const FGameplayAbilityTargetDataHandle& TargetDataHandle)
+{
+	for (TSharedPtr<FGameplayAbilityTargetData> Data : TargetDataHandle.Data)
+	{
+		Data->ApplyGameplayEffectSpec(*SpecHandle.Data.Get());
+	}
 }
 
 void ACharacterBase::AddAbilityToUI(TSubclassOf<UGameplayAbilityBase> AbilityToAdd)
